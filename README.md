@@ -1,34 +1,83 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# ig.news
 
-## Getting Started
+![cover](/.github/assets/cover.png)
 
-First, run the development server:
+## 📕 Sobre
 
-```bash
-npm run dev
-# or
-yarn dev
+Nesse projetos foi desenvolvido o **ig.news**, um blog voltado a notícias acerca do universo do ReactJS. Ele dá continuidade a uma série de projetos desenvolvidos durante o Bootcamp da *Rocketseat*, o **Ignite**. Dessa vez, foi abordada a contrução de uma aplicação com [NextJS](https://nextjs.org/), framework criado pela *Vercel*, baseado em React, que inclui ferramentas que aumentam a produtividade do desenvolvedor e permitem funcionalidades como geração de páginas estáticas e *server-side rendering*. A escolha do *Next* permite que o onteúdo das postagens possam ser indexadas em motores de busca, como Google, Bing e DuckDuckGo.
+
+Para a edição do conteúdo das postagens também foi utilizado um sistema de genrenciamento de conteúdo, ou CMS (content management system). O sistema escolhido foi o [PrismicIO](https://prismic.io/) devido a sua facilidade de integração direta com aplicações *NextJS*. 
+
+Além disso, para simular um sistema de assinatura mensal para acessar o conteúdo do blog foi utilizado o [Stripe](https://stripe.com/br). Por meio de sua API é possível receber e gerenciar pagamentos por meio de cartões de crédito de forma segura. 
+
+Por fim, o cadastro dos usuários na aplicação e a autenticação de acesso foram feitas respectivamentes pelo [FaunaDB](https://fauna.com/) e pelo [NextAuth](https://next-auth.js.org/). O *Fauna* é um banco de dados de documentos, *NoSQL*, que permite que as operações sejam realizadas sem manter uma conexão constante aberta, portanto perfeita para a utilização de função *serverless*. Além disso é possivel criar índices que permitem a busca por determinados parâmetros dentro do banco de dados. Outra vantagem do fauna é sua FQL (*Fauna Query Language*), que permite a execução de operações de uma forma bem semântica, como mostrado abaixo:
+
+```javascript
+await fauna.query(
+  q.If(                             // Se
+    q.Not(                          // Não
+      q.Exists(                     // Existir
+        q.Match(                    // Um usuário com o email buscado
+          q.Index("userByEmail"),   
+          q.Casefold(email),
+        )
+      )
+    ),
+    q.Create(                       // Crie
+      q.Collection("users"),        // Na coleção de usuários
+      { data: { email } }           // Um novo usuário com os dados "email"
+    ),
+    q.Get(                          // Caso contrário retorne
+      q.Match(                      // O usuário 
+        q.Index("userByEmail"),     // Com esse email
+        q.Casefold(email),
+      )
+    )
+  )
+);  
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Nessa query é criado um novo usuário caso não existem nenhum outro usuário com o mesmo email cadastrado. Contudo, se existir, simplesmente são retornadas suas informações.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+Já o *NextAuth* permite a autenticação por meio de diversas plataformas e redes sociais. Para esse projeto foi escolhido o GitHub, mas a inclusão de novos provedores seria também muito fácil de ser feita. 
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.tsx`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+Em resumo, nela é possivel:
+ - Logar com conta do GitHub;
+ - Assinar um plano mensal de acesso com cartão de crédito;
+ - Ler o conteúdo do blog;
+ - (Criador de Conteúdo) Adicionar, editar e remover postagens;
 
-## Learn More
+## 💻 Tecnologias
 
-To learn more about Next.js, take a look at the following resources:
+ - ReactJS
+ - TypeScript
+ - NextJS
+ - FaunaDB
+ - Prismic CMS
+ - Stripe
+ - CSS Modules
+ - SASS
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🚀 Rodando a aplicação
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Para rodar essa aplicação localmente é necessário clonar esse repositório:
 
-## Deploy on Vercel
+```bash
+$ git clone https://github.com/hereisjohnny2/03-ignews.git
+``` 
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Em seguida, acessar a pasta do repositório e rodar o comando `yarn` para instalar as depêndencias:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```bash
+$ cd 03-ignews
+$ yarn
+```
+
+Por fim, rodar o servidor local da aplicação:
+
+```bash
+$ yarn dev
+```
+
+A aplaicação estará disponível em http://localhost:8080/, portanto certifique-se que você não possui mais nada rodando nessa porta.
